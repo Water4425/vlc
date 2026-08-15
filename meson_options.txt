@@ -70,11 +70,6 @@ option('update-check',
     value : 'disabled',
     description : 'update checking system')
 
-option('vendored_rust_deps',
-    type : 'string',
-    value : 'no',
-    description : 'Should use vendored sources: `no`, `yes` or PATH_TO_VENDORED_SOURCES')
-
 option('sse',
     type : 'feature',
     value : 'auto',
