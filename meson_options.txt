@@ -70,11 +70,6 @@ option('update-check',
     value : 'disabled',
     description : 'update checking system')
 
-option('extra_rust_flags',
-    type : 'array',
-    value : [],
-    description : 'Extra RUSTFLAGS to be passed to the compiler when compiling Rust VLC modules')
-
 option('vendored_rust_deps',
     type : 'string',
     value : 'no',
