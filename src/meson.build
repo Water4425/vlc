@@ -530,5 +530,3 @@ vlc_tests += {
     'suite' : ['src'],
     'link_with' : [libvlccore],
 }
-
-subdir('rust')
