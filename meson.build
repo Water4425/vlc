@@ -127,9 +127,6 @@ if host_machine.cpu_family().startswith('x86')
     endif
 endif
 
-# Rust build system
-cargo_bin = find_program('cargo', required: get_option('rust'))
-
 #
 # General feature defines
 #
@@ -1159,13 +1156,6 @@ if (get_option('tests').allowed())
     # Integration and non-regression tests, some unittest are there too but the
     # modules/, src/ and lib/ folders should be favoured for those.
     subdir('test')
-endif
-
-if get_option('rust').allowed()
-    warning('''
-    The Rust module support is currently EXPERIMENTAL and INCOMPLETE.
-    Testing and reporting or contributing missing plugins and features is welcome!
-    ''')
 endif
 
 warning('''
