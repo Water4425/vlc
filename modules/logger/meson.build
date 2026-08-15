@@ -30,3 +30,4 @@ vlc_modules += {
     'name' : 'json_tracer',
     'sources' : files('json.c')
 }
+
