@@ -1311,6 +1311,22 @@ AS_IF([test "${enable_dbus}" != "no"], [
 ])
 AM_CONDITIONAL([HAVE_DBUS], [test "${have_dbus}" = "yes"])
 
+dnl
+dnl libnoidea support
+dnl
+AC_ARG_ENABLE([ndi],
+  [AS_HELP_STRING([--enable-ndi], [Build with NDI module (requires libnoidea)])],
+  [], [enable_ndi=yes]
+)
+AS_IF([test "${enable_ndi}" != "no"], [
+  PKG_CHECK_MODULES([NDI], [libnoidea >= 0.1.0], [
+    AC_DEFINE([HAVE_NDI], [1], [Define to 1 if you have libnoidea])
+    VLC_ADD_PLUGIN([ndi])
+  ], [
+    AC_MSG_WARN([libnoidea not found, NDI module will not be built])
+  ])
+])
+AM_CONDITIONAL([HAVE_NDI], [test "${enable_ndi}" = "yes"])
 
 dnl Check for systemd
 PKG_CHECK_MODULES([SYSTEMD], [libsystemd], [
@@ -4632,6 +4648,7 @@ dnl  MacOS X gui module
 dnl
 AC_ARG_ENABLE([macosx],
   AS_HELP_STRING([--enable-macosx], [Mac OS X gui support (default enabled on Mac OS X)]))
+enable_macosx_xctests="no"
 if test "${enable_macosx}" != "no" -a "${SYS}" = "darwin"
 then
 
@@ -4713,6 +4730,32 @@ then
   ])
 
   dnl
+  dnl If possible, use xcrun to find the right xctest tool
+  dnl
+
+  AS_IF([test ! "${XCRUN}" = "no"], [
+    AC_MSG_CHECKING([for xctest (using xcrun)])
+    XCTEST="$(eval $XCRUN -f xctest 2>/dev/null || echo no)"
+    AC_MSG_RESULT([${XCTEST}])
+  ], [
+    AC_MSG_WARN([Looking for tools without using xcrun])
+  ])
+
+  AS_IF([test "${XCTEST}" = "no"], [
+    AC_PATH_PROG(XCTEST, [xctest], [no])
+    AS_IF([test "${XCTEST}" = "no"], [
+      AC_MSG_WARN([xctest was not found, XCTest-based tests will not be run])
+    ])
+  ])
+  AS_IF([test "${cross_compiling}" = "yes"], [
+    AC_MSG_NOTICE([XCTest-based tests will not be run while cross-compiling])
+  ], [
+    AS_IF([test "${XCTEST}" != "no"], [
+      enable_macosx_xctests="yes"
+    ])
+  ])
+
+  dnl
   dnl  MacOS X gui module metal shaders
   dnl
   _enable_macosx_ui_shaders_default="yes"
@@ -4731,6 +4774,7 @@ then
 fi
 AM_CONDITIONAL([ENABLE_MACOSX_UI_SHADERS], [test "${enable_macosx_ui_shaders}" != "no" -a "${enable_macosx}" != "no" -a "${SYS}" = "darwin"])
 AM_CONDITIONAL([ENABLE_MACOSX_UI], [test "$enable_macosx" != "no" -a "${SYS}" = "darwin"])
+AM_CONDITIONAL([ENABLE_MACOSX_XCTESTS], [test "${enable_macosx_xctests}" = "yes"])
 
 dnl
 dnl  MacOS X sparkle update support
